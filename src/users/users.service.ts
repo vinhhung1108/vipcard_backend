@@ -1,8 +1,8 @@
-import { 
-  Injectable, 
-  ConflictException, 
-  InternalServerErrorException, 
-  BadRequestException 
+import {
+  Injectable,
+  ConflictException,
+  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -25,25 +25,35 @@ export class UsersService {
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    return await this.usersRepository.findOne({ where: { username } }) ?? null;
+    return (
+      (await this.usersRepository.findOne({ where: { username } })) ?? null
+    );
   }
 
   async findById(userId: number): Promise<User | null> {
-    return await this.usersRepository.findOne({ where: { id: userId } }) ?? null;
+    return (
+      (await this.usersRepository.findOne({ where: { id: userId } })) ?? null
+    );
   }
 
-  async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
+  async validateUser(
+    username: string,
+    password: string,
+  ): Promise<Omit<User, 'password'> | null> {
     const user = await this.findByUsername(username);
-  
-    if (user && await bcrypt.compare(password, user.password)) {
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...safeUser } = user; // Ẩn password khi trả về
       return safeUser;
     }
-  
+
     return null;
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async createUser(
+    createUserDto: CreateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     const hashedPassword = await this.hashPassword(createUserDto.password);
     const newUser = this.usersRepository.create({
       ...createUserDto,
@@ -52,10 +62,12 @@ export class UsersService {
 
     try {
       const savedUser = await this.usersRepository.save(newUser);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...safeUser } = savedUser;
       return safeUser;
     } catch (error) {
-      if (error.code === '23505') { // PostgreSQL unique_violation
+      if (error.code === '23505') {
+        // PostgreSQL unique_violation
         throw new ConflictException('Username or email already exists');
       }
       console.error(error);
@@ -63,7 +75,10 @@ export class UsersService {
     }
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<Omit<User, 'password'>> {
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.findById(id);
     if (!user) {
       throw new BadRequestException('User not found');
@@ -71,6 +86,7 @@ export class UsersService {
 
     await this.usersRepository.update(id, updateUserDto);
     const updatedUser = await this.findById(id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = updatedUser;
     return safeUser;
   }
@@ -87,16 +103,23 @@ export class UsersService {
 
   async getAllUsers(): Promise<Omit<User, 'password'>[]> {
     const users = await this.usersRepository.find();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return users.map(({ password, ...safeUser }) => safeUser);
   }
 
-  async changePassword(id: number, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
+  async changePassword(
+    id: number,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
     const user = await this.findById(id);
     if (!user) {
       throw new BadRequestException('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(changePasswordDto.oldPassword, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      changePasswordDto.oldPassword,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new BadRequestException('Old password is incorrect');
     }
@@ -106,7 +129,10 @@ export class UsersService {
     return { message: 'Password updated successfully' };
   }
 
-  async updateRoles(id: number, updateRolesDto: UpdateRolesDto): Promise<{ message: string }> {
+  async updateRoles(
+    id: number,
+    updateRolesDto: UpdateRolesDto,
+  ): Promise<{ message: string }> {
     const user = await this.findById(id);
     if (!user) {
       throw new BadRequestException('User not found');
@@ -128,10 +154,13 @@ export class UsersService {
     return { message: `User ${user.isActive ? 'activated' : 'deactivated'}` };
   }
 
-  async updateRefreshToken(userId: number, refreshToken: string): Promise<void> {
+  async updateRefreshToken(
+    userId: number,
+    refreshToken: string,
+  ): Promise<void> {
     await this.usersRepository.update(userId, { refreshToken });
   }
-  
+
   async clearRefreshToken(userId: number): Promise<void> {
     await this.usersRepository.update(userId, { refreshToken: null });
   }

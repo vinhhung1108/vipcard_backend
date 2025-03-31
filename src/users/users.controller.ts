@@ -1,14 +1,14 @@
-import { 
-  BadRequestException, 
-  Body, 
-  Controller, 
-  Get, 
-  Post, 
-  Patch, 
-  Delete, 
-  UseGuards, 
-  Request, 
-  Param 
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  UseGuards,
+  Request,
+  Param,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from './users.service';
@@ -29,13 +29,14 @@ export class UsersController {
     if (!user) {
       throw new BadRequestException('User not found');
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user; // Loại bỏ password
     return { message: 'Bạn đã đăng nhập thành công!', user: safeUser };
   }
 
   // 🟢 Tạo người dùng mới (Chỉ Admin)
   @Post('create')
-  @UseGuards(JwtAuthGuard) 
+  @UseGuards(JwtAuthGuard)
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
   }
@@ -43,7 +44,10 @@ export class UsersController {
   // 🟢 Cập nhật thông tin người dùng
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+  async updateUser(
+    @Param('id') id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
@@ -64,14 +68,20 @@ export class UsersController {
   // 🟢 Đổi mật khẩu
   @Patch('change-password/:id')
   @UseGuards(JwtAuthGuard)
-  async changePassword(@Param('id') id: number, @Body() changePasswordDto: ChangePasswordDto) {
+  async changePassword(
+    @Param('id') id: number,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
     return this.usersService.changePassword(id, changePasswordDto);
   }
 
   // 🟢 Cập nhật vai trò (roles) của user (Chỉ Admin)
   @Patch('roles/:id')
   @UseGuards(JwtAuthGuard)
-  async updateRoles(@Param('id') id: number, @Body() updateRolesDto: UpdateRolesDto) {
+  async updateRoles(
+    @Param('id') id: number,
+    @Body() updateRolesDto: UpdateRolesDto,
+  ) {
     return this.usersService.updateRoles(id, updateRolesDto);
   }
 

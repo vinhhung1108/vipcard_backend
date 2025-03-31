@@ -1,4 +1,3 @@
 export class UpdateRolesDto {
-    roles: string[];
-  }
-  
+  roles: string[];
+}
