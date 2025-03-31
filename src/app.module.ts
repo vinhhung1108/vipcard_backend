@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [
@@ -14,9 +15,11 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      // synchronize: true, // Không dùng trên môi trường production
+      entities: [User],
+      // autoLoadEntities: true,
+      synchronize: true, // Không dùng trên môi trường production
     }),
+    TypeOrmModule.forFeature([User]), // Đăng ký entity
     UsersModule,
     AuthModule,
   ],

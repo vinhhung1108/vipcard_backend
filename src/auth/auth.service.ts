@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,20 +14,59 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findByUsername(username);
     if (!user) {
-        throw new Error('User not found');
-      }
-      
-    if (user && await bcrypt.compare(pass, user.password)) {
-      const { password, ...result } = user;
-      return result;
+      return null;
     }
-    return null;
+    const isPasswordValid = await bcrypt.compare(pass, user.password);
+    if (!isPasswordValid) {
+      return null;
+    }
+    const { password, ...userData } = user;
+    return Object.assign({}, userData);
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
+  async generateTokens(user: any) {
+    const payload = { 
+      username: user.username, 
+      sub: user.id, 
+      roles: Array.isArray(user.roles) ? user.roles : ['user'] 
     };
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // Refresh token có hạn 7 ngày
+
+    // Hash refresh token trước khi lưu vào database
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
+
+    return { access_token: accessToken, refresh_token: refreshToken };
+  }
+
+  async login(loginDto: LoginDto) {
+    const user = await this.validateUser(loginDto.username, loginDto.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid username or password');
+    }
+
+    const tokens = await this.generateTokens(user);
+    return { message: 'Login successful', ...tokens, user };
+  }
+
+  async refreshAccessToken(userId: number, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    return this.generateTokens(user);
+  }
+
+  async logout(userId: number) {
+    await this.usersService.clearRefreshToken(userId);
+    return { message: 'Logout successful' };
   }
 }
