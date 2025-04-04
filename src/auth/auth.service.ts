@@ -20,15 +20,16 @@ export class AuthService {
     if (!isPasswordValid) {
       return null;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userData } = user;
     return Object.assign({}, userData);
   }
 
   async generateTokens(user: any) {
-    const payload = { 
-      username: user.username, 
-      sub: user.id, 
-      roles: Array.isArray(user.roles) ? user.roles : ['user'] 
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      roles: Array.isArray(user.roles) ? user.roles : ['user'],
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });

@@ -36,7 +36,6 @@ export class UsersController {
 
   // 🟢 Tạo người dùng mới (Chỉ Admin)
   @Post('create')
-  @UseGuards(JwtAuthGuard)
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
   }
