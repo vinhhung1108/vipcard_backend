@@ -5,7 +5,7 @@ import {
   Get,
   UnauthorizedException,
   UseGuards,
-  Request,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -37,7 +37,7 @@ export class AuthController {
   // Kiểm tra access token hợp lệ (route test)
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     return { message: 'Authenticated', user: req.user };
   }
 }
