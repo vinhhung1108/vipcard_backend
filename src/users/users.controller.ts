@@ -16,7 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateRolesDto } from './dto/update-roles.dto';
-import { Roles } from './roles/roles.decorator';
+import { Roles } from '/src/common/roles/roles.decorator';
 
 @Controller('users')
 export class UsersController {
