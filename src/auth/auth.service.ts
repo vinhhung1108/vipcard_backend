@@ -48,9 +48,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
+    await this.usersService.updateUser(user.id, {
+      lastLoginAt: new Date(),
+    });
     const tokens = await this.generateTokens(user);
     const freshUser = await this.usersService.findById(user.id);
     const { password, refreshToken, ...safeUser } = freshUser;
+
     return { message: 'Login successful', ...tokens, user: safeUser };
   }
 

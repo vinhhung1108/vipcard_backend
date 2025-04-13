@@ -6,9 +6,10 @@ import { User } from './user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]),
-  forwardRef(() => AuthModule) // 🔹 Đảm bảo AuthModule dùng forwardRef
-],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    forwardRef(() => AuthModule), // 🔹 Đảm bảo AuthModule dùng forwardRef
+  ],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],
