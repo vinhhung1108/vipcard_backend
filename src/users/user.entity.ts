@@ -1,8 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-@Unique(['username'])
-@Unique(['email'])
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,21 +8,24 @@ export class User {
   @Column({ unique: true })
   username: string;
 
+  @Column({ unique: true })
+  email: string;
+
   @Column()
   password: string;
 
-  @Column()
-  fullName: string;
-
-  @Column({ unique: true })
-  email: string;
+  @Column('varchar', { array: true, default: '{default}' })
+  roles: string[];
 
   @Column({ default: true })
   isActive: boolean;
 
-  @Column('json', { default: ['user'] })
-  roles: string[];
-
   @Column({ nullable: true })
-  refreshToken?: string; // Lưu refresh token đã mã hóa
+  refreshToken: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

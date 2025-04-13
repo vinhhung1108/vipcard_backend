@@ -29,7 +29,7 @@ export class AuthService {
     const payload = {
       username: user.username,
       sub: user.id,
-      roles: Array.isArray(user.roles) ? user.roles : ['user'],
+      roles: Array.isArray(user.roles) ? user.roles : ['default'],
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -49,7 +49,9 @@ export class AuthService {
     }
 
     const tokens = await this.generateTokens(user);
-    return { message: 'Login successful', ...tokens, user };
+    const freshUser = await this.usersService.findById(user.id);
+    const { password, refreshToken, ...safeUser } = freshUser;
+    return { message: 'Login successful', ...tokens, user: safeUser };
   }
 
   async refreshAccessToken(userId: number, refreshToken: string) {

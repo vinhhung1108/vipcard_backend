@@ -18,6 +18,7 @@ import { User } from './users/user.entity';
       entities: [User],
       // autoLoadEntities: true,
       synchronize: true, // Không dùng trên môi trường production
+      logging: true,
     }),
     TypeOrmModule.forFeature([User]), // Đăng ký entity
     UsersModule,
