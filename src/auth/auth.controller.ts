@@ -1,4 +1,10 @@
-import { Body, Controller, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -14,14 +20,22 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('refresh-token')
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshAccessToken(refreshTokenDto.userId, refreshTokenDto.refreshToken);
-  }
 
   @Post('logout')
   @UseGuards(JwtAuthGuard) // Đảm bảo user đã đăng nhập mới logout được
   async logout(@Body() logoutDto: LogoutDto) {
     return this.authService.logout(logoutDto.userId);
+  }
+
+  @Post('refresh')
+  async refresh(@Body() body: { userId: number; refreshToken: string }) {
+    return this.authService.refreshAccessToken(body.userId, body.refreshToken);
+  }
+
+  // Kiểm tra access token hợp lệ (route test)
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Request() req) {
+    return { message: 'Authenticated', user: req.user };
   }
 }
