@@ -1,15 +1,6 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Get,
-  UnauthorizedException,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -21,7 +12,6 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
-
 
   @Post('logout')
   @UseGuards(JwtAuthGuard) // Đảm bảo user đã đăng nhập mới logout được

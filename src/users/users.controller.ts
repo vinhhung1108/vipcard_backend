@@ -16,7 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateRolesDto } from './dto/update-roles.dto';
-import { Roles } from '@src/common/roles/roles.decorator';
+import { Roles } from '@src/common/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -68,8 +68,8 @@ export class UsersController {
 
   @Roles('admin')
   @Get('admin-dashboard')
-  async getAdminData(){
-    return {message:'admin data'}
+  async getAdminData() {
+    return { message: 'admin data' };
   }
 
   // 🟢 Đổi mật khẩu
