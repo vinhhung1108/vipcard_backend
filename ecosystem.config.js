@@ -6,7 +6,7 @@ module.exports = {
       cwd: '/home/vipcard-api',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 3001,
         JWT_SECRET: 'vipcardsecretkeynamident',
         DB_HOST: 'localhost',
         DB_PORT: '5432',
