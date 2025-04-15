@@ -1,28 +1,26 @@
 // src/webhook/webhook.controller.ts
-import { Controller, Post, Headers, Body } from '@nestjs/common';
+import { Controller, Post, Headers, Body, HttpCode } from '@nestjs/common';
 import { exec } from 'child_process';
 
-@Controller('github-webhook')
+@Controller('webhook')
 export class WebhookController {
   @Post()
-  handleWebhook(@Headers() headers, @Body() body) {
-    // Kiểm tra nếu là push vào nhánh main
-    if (body?.ref === 'refs/heads/main') {
-      console.log('Received push on main branch. Pulling code...');
+  @HttpCode(200)
+  handlePush(
+    @Headers('x-github-event') githubEvent: string,
+    @Body() body: any,
+  ) {
+    if (githubEvent === 'push') {
+      console.log('Webhook received push event from GitHub');
 
-      exec(
-        'cd /home/vipcard-api && git pull origin main && npm run build && pm2 restart apicard',
-        (err, stdout, stderr) => {
-          if (err) {
-            console.error(`Error: ${err.message}`);
-            return;
-          }
-          console.log(`stdout: ${stdout}`);
-          console.error(`stderr: ${stderr}`);
-        },
-      );
+      exec('cd /home/vipcard-api && git pull origin main && pm2 restart apicard', (err, stdout, stderr) => {
+        if (err) {
+          console.error('Deployment error:', err);
+          return;
+        }
+        console.log('Deployment output:', stdout);
+        console.error('Deployment errors:', stderr);
+      });
     }
-
-    return { message: 'Webhook received' };
   }
 }
