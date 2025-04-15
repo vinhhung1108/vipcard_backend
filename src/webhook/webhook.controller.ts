@@ -1,28 +1,40 @@
-// src/webhook/webhook.controller.ts
-import { Controller, Post, Headers, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Headers, Body, HttpCode, Res } from '@nestjs/common';
 import { exec } from 'child_process';
+import { Response } from 'express';
 
 @Controller('webhook')
 export class WebhookController {
   @Post()
   @HttpCode(200)
-  handlePush(
+  handleWebhook(
     @Headers('x-github-event') githubEvent: string,
     @Body() body: any,
+    @Res() res: Response,
   ) {
-    if (githubEvent === 'push') {
-      console.log('Webhook received push event from GitHub');
+    const branchRef = body.ref;
+    if (githubEvent === 'push' && branchRef === 'refs/heads/main') {
+      const commands = `
+        cd /home/vipcard-api && \
+        git pull origin main && \
+        npm run build && \
+        pm2 restart apicard
+      `;
 
-      exec(
-        'cd /home/vipcard-api && git pull origin main && pm2 restart apicard',
-        (err, stdout, stderr) => {
-          if (err) {
-            console.error('Deployment error:', err);
-            return;
-          }
-          console.log('Deployment output:', stdout);
-          console.error('Deployment errors:', stderr);
+      exec(commands, (error, stdout, stderr) => {
+        if (error) {
+          console.error('❌ Auto-deploy error:', error.message);
+          return res
+            .status(500)
+            .json({ message: 'Deploy failed', error: error.message });
+        }
+
+        console.log('✅ Auto-deploy output:', stdout);
+        return res
+          .status(200)
+          .json({ message: 'Deploy successful', output: stdout });
       });
+    } else {
+      return res.status(200).json({ message: 'No action taken' });
     }
   }
 }
