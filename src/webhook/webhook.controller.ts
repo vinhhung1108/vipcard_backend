@@ -13,13 +13,15 @@ export class WebhookController {
     if (githubEvent === 'push') {
       console.log('Webhook received push event from GitHub');
 
-      exec('cd /home/vipcard-api && git pull origin main && pm2 restart apicard', (err, stdout, stderr) => {
-        if (err) {
-          console.error('Deployment error:', err);
-          return;
-        }
-        console.log('Deployment output:', stdout);
-        console.error('Deployment errors:', stderr);
+      exec(
+        'cd /home/vipcard-api && git pull origin main && pm2 restart apicard',
+        (err, stdout, stderr) => {
+          if (err) {
+            console.error('Deployment error:', err);
+            return;
+          }
+          console.log('Deployment output:', stdout);
+          console.error('Deployment errors:', stderr);
       });
     }
   }
