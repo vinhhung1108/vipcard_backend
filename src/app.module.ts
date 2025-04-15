@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './users/user.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from '@src/common/guards/roles.guard';
+import { WebhookModule } from './webhook/webhook.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RolesGuard } from '@src/common/guards/roles.guard';
     TypeOrmModule.forFeature([User]), // Đăng ký entity
     UsersModule,
     AuthModule,
+    WebhookModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: RolesGuard }],
 })

@@ -7,7 +7,7 @@ console.log('JWT_SECRET from .env:', process.env.JWT_SECRET); // Thêm dòng nà
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT ?? 3000;
+  const port = process.env.PORT ?? 3001;
   await app.listen(port, '0.0.0.0');
   console.log(`Server is running on port ${port}`);
 }
