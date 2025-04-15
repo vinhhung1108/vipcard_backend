@@ -31,7 +31,7 @@ export class WebhookController {
         console.log('✅ Auto-deploy output:', stdout);
         return res
           .status(200)
-          .json({ message: 'Deploy successful', output: stdout });
+          .json({ message: 'Deploy successful thành công', output: stdout });
       });
     } else {
       return res.status(200).json({ message: 'No action taken' });
