@@ -16,6 +16,7 @@ export class WebhookController {
       const commands = `
         cd /home/vipcard-api && \
         git pull origin main && \
+        npm install && \
         npm run build && \
         pm2 restart apicard
       `;
