@@ -98,3 +98,9 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 # vipcard_backend
+
+API for managing users with roles.
+
+## Setup
+1. Install dependencies: `npm install`
+2. Configure `.env`:

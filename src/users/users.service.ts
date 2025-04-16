@@ -61,7 +61,6 @@ export class UsersService {
       roles: createUserDto.roles || ['default'], // Mặc định rỗng
       isActive: createUserDto.isActive ?? true, // Mặc định true
       createdAt: new Date(),
-      updatedAt: new Date(),
     });
 
     try {

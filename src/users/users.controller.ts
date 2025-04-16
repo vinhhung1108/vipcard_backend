@@ -17,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateRolesDto } from './dto/update-roles.dto';
 import { Roles } from '@src/common/decorators/roles.decorator';
+import { Role } from '@src/common/enums/roles.enum';
 
 @Controller('users')
 export class UsersController {
@@ -59,15 +60,16 @@ export class UsersController {
   }
 
   // 🟢 Lấy danh sách tất cả người dùng (Chỉ Admin)
-  @Roles('admin')
   @Get()
   @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   async getAllUsers() {
     return this.usersService.getAllUsers();
   }
 
-  @Roles('admin')
   @Get('admin-dashboard')
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   async getAdminData() {
     return { message: 'admin data' };
   }

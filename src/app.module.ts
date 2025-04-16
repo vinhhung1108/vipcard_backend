@@ -20,7 +20,7 @@ import { WebhookModule } from './webhook/webhook.module';
       database: process.env.DB_NAME,
       entities: [User],
       // autoLoadEntities: true,
-      synchronize: true, // Không dùng trên môi trường production
+      synchronize: process.env.NODE_ENV !== 'production',
       logging: true,
     }),
     TypeOrmModule.forFeature([User]), // Đăng ký entity
