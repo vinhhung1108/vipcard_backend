@@ -21,7 +21,7 @@ export class WebhookController {
         pm2 restart apicard
       `;
 
-      exec(commands, (error, stdout, stderr) => {
+      exec(commands, (error, stdout) => {
         if (error) {
           console.error('❌ Auto-deploy error:', error.message);
           return res

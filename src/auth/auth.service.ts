@@ -53,6 +53,7 @@ export class AuthService {
     });
     const tokens = await this.generateTokens(user);
     const freshUser = await this.usersService.findById(user.id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...safeUser } = freshUser;
 
     return { message: 'Login successful', ...tokens, user: safeUser };

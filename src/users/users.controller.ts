@@ -33,7 +33,7 @@ export class UsersController {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user; // Loại bỏ password
-    return { message: 'Bạn đã đăng nhập thành công!', user: safeUser };
+    return { user: safeUser };
   }
 
   // 🟢 Tạo người dùng mới (Chỉ Admin)

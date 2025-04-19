@@ -167,4 +167,8 @@ export class UsersService {
   async clearRefreshToken(userId: number): Promise<void> {
     await this.usersRepository.update(userId, { refreshToken: null });
   }
+
+  async updateLastLogin(userId: number) {
+    await this.usersRepository.update(userId, { lastLoginAt: new Date() });
+  }
 }

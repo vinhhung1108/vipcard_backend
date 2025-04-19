@@ -1,8 +1,15 @@
-import { Body, Controller, Post, Get, UseGuards, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +34,7 @@ export class AuthController {
   // Kiểm tra access token hợp lệ (route test)
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Req() req) {
-    return { message: 'Authenticated', user: req.user };
+  getProfile(@Request() req) {
+    return { user: req.user };
   }
 }
