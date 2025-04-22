@@ -10,7 +10,10 @@ dayjs.extend(timezone);
 
 const DEFAULT_TIMEZONE = process.env.TIMEZONE || 'UTC';
 
-console.log('Default timezone:', DEFAULT_TIMEZONE); // Kiểm tra timezone mặc định
+console.log(
+  'Current time in default timezone:',
+  dayjs().tz(DEFAULT_TIMEZONE).format('YYYY-MM-DD HH:mm:ss'),
+); // Kiểm tra thời gian hiện tại trong timezone mặc định
 
 export function formatToTimezone(
   date?: Date | string,
