@@ -16,13 +16,12 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 
   const config = new DocumentBuilder()
-    .setTitle('VIPCard API')
-    .setDescription('API quản lý hệ thống thẻ VIP')
-    .setVersion('1.1')
-    .addBearerAuth() // nếu bạn dùng JWT
+    .setTitle('VIPCARD API')
+    .setDescription('Hệ thống quản lý api vipcard')
+    .setVersion('1.0')
+    .addTag('cats')
     .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 }
 bootstrap();
