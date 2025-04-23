@@ -23,7 +23,7 @@ async function bootstrap() {
     .addBearerAuth() // nếu bạn dùng JWT
     .build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 }
 bootstrap();
