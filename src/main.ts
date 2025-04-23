@@ -19,11 +19,11 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('VIPCard API')
     .setDescription('API quản lý hệ thống thẻ VIP')
-    .setVersion('1.0')
+    .setVersion('1.1')
     .addBearerAuth() // nếu bạn dùng JWT
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 }
 bootstrap();
