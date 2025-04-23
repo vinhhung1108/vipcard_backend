@@ -7,6 +7,10 @@ import { User } from './users/user.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from '@src/common/guards/roles.guard';
 import { WebhookModule } from './webhook/webhook.module';
+import { ServiceModule } from './service/service.module';
+import { PartnerModule } from './partner/partner.module';
+import { ReferralCodeModule } from './referral-code/referral-code.module';
+import { CardModule } from './card/card.module';
 
 @Module({
   imports: [
@@ -27,6 +31,10 @@ import { WebhookModule } from './webhook/webhook.module';
     UsersModule,
     AuthModule,
     WebhookModule,
+    ServiceModule,
+    PartnerModule,
+    ReferralCodeModule,
+    CardModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: RolesGuard }],
 })
