@@ -16,8 +16,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('VIPCARD API')
     .setDescription('Hệ thống quản lý api vipcard')
-    .setVersion('1.0')
-    .addTag('cats')
+    .setVersion('1.1')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory());
