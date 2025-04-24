@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([ReferralCode])],
   providers: [ReferralCodeService],
   controllers: [ReferralCodeController],
+  exports: [ReferralCodeService],
 })
 export class ReferralCodeModule {}
