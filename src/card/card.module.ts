@@ -7,11 +7,15 @@ import { Service } from '@src/service/entities/service.entity';
 import { Partner } from '@src/partner/entities/partner.entity';
 import { ReferralCode } from '@src/referral-code/entities/referral-code.entity';
 import { ServiceModule } from '@src/service/service.module';
+import { PartnerModule } from '@src/partner/partner.module';
+import { ReferralCodeModule } from '@src/referral-code/referral-code.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Card, Service, Partner, ReferralCode]),
     ServiceModule,
+    PartnerModule,
+    ReferralCodeModule,
   ],
   providers: [CardService],
   controllers: [CardController],
