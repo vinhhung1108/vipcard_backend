@@ -5,12 +5,14 @@ import {
   ManyToMany,
   JoinTable,
   ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { Partner } from '@src/partner/entities/partner.entity';
 import { Service } from '@src/service/entities/service.entity';
+import { Partner } from '@src/partner/entities/partner.entity';
 import { ReferralCode } from '@src/referral-code/entities/referral-code.entity';
 
-@Entity('cards')
+@Entity()
 export class Card {
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,23 +20,29 @@ export class Card {
   @Column({ unique: true })
   code: string;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 12, scale: 2 })
   value: number;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 12, scale: 2 })
   remainingValue: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp' })
   expireAt: Date;
 
-  @ManyToMany(() => Service)
+  @ManyToMany(() => Service, { eager: true })
   @JoinTable()
   services: Service[];
 
-  @ManyToMany(() => Partner)
+  @ManyToMany(() => Partner, { eager: true })
   @JoinTable()
   partners: Partner[];
 
-  @ManyToOne(() => ReferralCode, { nullable: true })
-  referralCode: ReferralCode;
+  @ManyToOne(() => ReferralCode, { nullable: true, eager: true })
+  referralCode?: ReferralCode;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
