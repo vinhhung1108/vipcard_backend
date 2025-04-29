@@ -9,10 +9,12 @@ import { ReferralCode } from '@src/referral-code/entities/referral-code.entity';
 import { ServiceModule } from '@src/service/service.module';
 import { PartnerModule } from '@src/partner/partner.module';
 import { ReferralCodeModule } from '@src/referral-code/referral-code.module';
+import { AuthModule } from '@src/auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Card, Service, Partner, ReferralCode]),
+    AuthModule,
     ServiceModule,
     PartnerModule,
     ReferralCodeModule,
