@@ -28,7 +28,8 @@ import { ReferralCode } from './referral-code/entities/referral-code.entity';
       database: process.env.DB_NAME,
       entities: [Card, Partner, Service, ReferralCode, User],
       // autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production',
+      // synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: true, // Chỉ nên dùng trong môi trường phát triển
       logging: true,
     }),
     TypeOrmModule.forFeature([User]), // Đăng ký entity

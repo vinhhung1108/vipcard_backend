@@ -12,27 +12,29 @@ export class ServiceService {
     private readonly serviceRepository: Repository<Service>,
   ) {}
 
-  create(dto: CreateServiceDto) {
-    const service = this.serviceRepository.create(dto);
+  create(createServiceDto: CreateServiceDto): Promise<Service> {
+    const service = this.serviceRepository.create(createServiceDto);
     return this.serviceRepository.save(service);
   }
 
-  findAll() {
+  findAll(): Promise<Service[]> {
     return this.serviceRepository.find();
   }
 
-  findOne(id: number) {
-    return this.serviceRepository.findOne({ where: { id } });
-  }
-
-  async update(id: number, dto: UpdateServiceDto) {
-    await this.serviceRepository.update(id, dto);
-    return this.findOne(id);
-  }
-
-  async remove(id: number) {
-    const service = await this.findOne(id);
+  async findOne(id: number): Promise<Service> {
+    const service = await this.serviceRepository.findOne({ where: { id } });
     if (!service) throw new NotFoundException('Service not found');
-    return this.serviceRepository.remove(service);
+    return service;
+  }
+
+  async update(id: number, dto: UpdateServiceDto): Promise<Service> {
+    const service = await this.findOne(id);
+    Object.assign(service, dto);
+    return this.serviceRepository.save(service);
+  }
+
+  async remove(id: number): Promise<void> {
+    const service = await this.findOne(id);
+    await this.serviceRepository.remove(service);
   }
 }

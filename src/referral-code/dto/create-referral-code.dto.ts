@@ -1,5 +1,5 @@
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateReferralCodeDto {
   @ApiProperty({ example: 'REF123' })
@@ -7,15 +7,7 @@ export class CreateReferralCodeDto {
   @IsNotEmpty()
   code: string;
 
-  @ApiProperty({ example: 'MNguồn giới thiệu' })
+  @ApiProperty({ example: 'Mã giới thiệu dành cho khách hàng thân thiết' })
   @IsString()
   description: string;
-
-  @ApiProperty({ example: 'MNguồn giới thiệu' })
-  @IsString()
-  note: string;
-
-  @ApiProperty({ example: 10 })
-  @IsNumber()
-  discount: number;
 }

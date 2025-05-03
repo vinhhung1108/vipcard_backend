@@ -17,13 +17,13 @@ export class Card {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   code: string;
 
-  @Column('decimal', { precision: 12, scale: 2 })
+  @Column('decimal')
   value: number;
 
-  @Column('decimal', { precision: 12, scale: 2 })
+  @Column('decimal')
   remainingValue: number;
 
   @Column({ type: 'timestamp' })
@@ -38,7 +38,7 @@ export class Card {
   partners: Partner[];
 
   @ManyToOne(() => ReferralCode, { nullable: true, eager: true })
-  referralCode?: ReferralCode;
+  referralCode: ReferralCode;
 
   @CreateDateColumn()
   createdAt: Date;

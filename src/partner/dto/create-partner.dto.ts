@@ -1,14 +1,24 @@
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreatePartnerDto {
-  @ApiProperty({ example: 'Salon Nam Thành' })
-  @IsString()
+  @ApiProperty()
   @IsNotEmpty()
+  @IsString()
   name: string;
 
-  @ApiProperty({ example: '123 Đường ABC, Quận 1, TP.HCM' })
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  address: string;
+  address?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  email?: string;
 }

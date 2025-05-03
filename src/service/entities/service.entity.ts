@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Card } from '@src/card/entities/card.entity';
 
-@Entity('services')
+@Entity()
 export class Service {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,4 +11,7 @@ export class Service {
 
   @Column({ nullable: true })
   description: string;
+
+  @ManyToMany(() => Card, (card) => card.services)
+  cards: Card[];
 }

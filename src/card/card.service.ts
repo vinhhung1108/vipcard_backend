@@ -1,52 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Card } from './entities/card.entity';
-import { Service } from '@src/service/entities/service.entity';
-import { Partner } from '@src/partner/entities/partner.entity';
-import { ReferralCode } from '@src/referral-code/entities/referral-code.entity';
 import { In, Repository } from 'typeorm';
+import { Card } from './entities/card.entity';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { Service as CardServiceEntity } from '@src/service/entities/service.entity';
+import { Partner } from '@src/partner/entities/partner.entity';
+import { ReferralCode } from '@src/referral-code/entities/referral-code.entity';
 
 @Injectable()
 export class CardService {
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
-    @InjectRepository(Service)
-    private readonly serviceRepository: Repository<Service>,
+    @InjectRepository(CardServiceEntity)
+    private readonly serviceRepository: Repository<CardServiceEntity>,
     @InjectRepository(Partner)
     private readonly partnerRepository: Repository<Partner>,
     @InjectRepository(ReferralCode)
     private readonly referralCodeRepository: Repository<ReferralCode>,
   ) {}
 
-  async create(createCardDto: CreateCardDto): Promise<Card> {
-    const { serviceIds, partnerIds, referralCodeId, ...cardData } =
-      createCardDto;
+  async create(dto: CreateCardDto): Promise<Card> {
+    const { serviceIds, partnerIds, referralCodeId, ...data } = dto;
 
-    const services = serviceIds?.length
-      ? await this.serviceRepository.find({
-          where: { id: In(serviceIds) },
-        })
-      : [];
-
-    const partners = partnerIds?.length
-      ? await this.partnerRepository.find({
-          where: { id: In(partnerIds) },
-        })
-      : [];
+    const services = await this.serviceRepository.find({ where: { id: In(serviceIds) } });
+    const partners = await this.partnerRepository.find({ where: { id: In(partnerIds) } });
     const referralCode = referralCodeId
-      ? await this.referralCodeRepository.findOne({
-          where: { id: referralCodeId },
-        })
+      ? await this.referralCodeRepository.findOneBy({ id: referralCodeId })
       : null;
-    if (referralCodeId && !referralCode) {
-      throw new NotFoundException('Referral code not found');
-    }
 
     const card = this.cardRepository.create({
-      ...cardData,
+      ...data,
+      expireAt: new Date(dto.expireAt),
       services,
       partners,
       referralCode,
@@ -55,46 +41,31 @@ export class CardService {
     return this.cardRepository.save(card);
   }
 
-  async findAll(): Promise<Card[]> {
-    try {
-      return await this.cardRepository.find({
-        relations: ['services', 'partners', 'referralCode'],
-      });
-    } catch (error) {
-      console.error('Error in CardService.findAll:', error);
-      throw new Error('Failed to fetch cards');
-    }
+  findAll(): Promise<Card[]> {
+    return this.cardRepository.find();
   }
 
   findOne(id: number): Promise<Card> {
-    return this.cardRepository.findOne({
-      where: { id },
-      relations: ['services', 'partners', 'referralCode'],
-    });
+    return this.cardRepository.findOneByOrFail({ id });
   }
 
-  async update(id: number, updateCardDto: UpdateCardDto): Promise<Card> {
-    const card = await this.cardRepository.findOne({ where: { id } });
+  async update(id: number, dto: UpdateCardDto): Promise<Card> {
+    const card = await this.cardRepository.findOneBy({ id });
     if (!card) throw new NotFoundException('Card not found');
 
-    const { serviceIds, partnerIds, referralCodeId, ...cardData } =
-      updateCardDto;
-
-    const services = serviceIds
-      ? await this.serviceRepository.find({ where: { id: In(serviceIds) } })
+    const services = dto.serviceIds
+      ? await this.serviceRepository.find({ where: { id: In(dto.serviceIds) } })
       : card.services;
 
-    const partners = partnerIds
-      ? await this.partnerRepository.find({ where: { id: In(partnerIds) } })
+    const partners = dto.partnerIds
+      ? await this.partnerRepository.find({ where: { id: In(dto.partnerIds) } })
       : card.partners;
 
-    const referralCode = referralCodeId
-      ? await this.referralCodeRepository.findOne({
-          where: { id: referralCodeId },
-        })
+    const referralCode = dto.referralCodeId
+      ? await this.referralCodeRepository.findOneBy({ id: dto.referralCodeId })
       : card.referralCode;
 
-    Object.assign(card, cardData, {
+    Object.assign(card, dto, {
       services,
       partners,
       referralCode,
@@ -104,8 +75,6 @@ export class CardService {
   }
 
   async remove(id: number): Promise<void> {
-    const card = await this.cardRepository.findOne({ where: { id } });
-    if (!card) throw new NotFoundException('Card not found');
-    await this.cardRepository.remove(card);
+    await this.cardRepository.delete(id);
   }
 }

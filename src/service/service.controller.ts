@@ -6,37 +6,53 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ServiceService } from './service.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { JwtAuthGuard } from '@src/auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { Service } from './entities/service.entity';
 
+@ApiTags('services')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('services')
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
   @Post()
-  create(@Body() dto: CreateServiceDto) {
+  @ApiResponse({ status: 201, type: Service })
+  create(@Body() dto: CreateServiceDto): Promise<Service> {
     return this.serviceService.create(dto);
   }
 
   @Get()
-  findAll() {
+  @ApiResponse({ status: 200, type: [Service] })
+  findAll(): Promise<Service[]> {
     return this.serviceService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.serviceService.findOne(+id);
+  @ApiResponse({ status: 200, type: Service })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Service> {
+    return this.serviceService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateServiceDto) {
-    return this.serviceService.update(+id, dto);
+  @ApiResponse({ status: 200, type: Service })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateServiceDto,
+  ): Promise<Service> {
+    return this.serviceService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.serviceService.remove(+id);
+  @ApiResponse({ status: 204, description: 'Service deleted' })
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.serviceService.remove(id);
   }
 }

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Card } from '@src/card/entities/card.entity';
 
-@Entity('referral_codes')
+@Entity()
 export class ReferralCode {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,12 +9,9 @@ export class ReferralCode {
   @Column({ unique: true })
   code: string;
 
-  @Column({ nullable: true })
+  @Column()
   description: string;
 
-  @Column({ default: 0 })
-  discount: number;
-
-  @Column({ nullable: true })
-  note: string;
+  @OneToMany(() => Card, (card) => card.referralCode)
+  cards: Card[];
 }

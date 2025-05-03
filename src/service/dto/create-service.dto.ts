@@ -1,14 +1,11 @@
-// src/service/dto/create-service.dto.ts
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateServiceDto {
-  @ApiProperty({ example: 'Chăm sóc da mặt', description: 'Tên dịch vụ' })
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    example: 'Dịch vụ chăm sóc da chuyên sâu bằng máy móc hiện đại.',
-    description: 'Mô tả dịch vụ',
-    required: false,
-  })
+  @IsString()
+  @IsOptional()
   description?: string;
 }
