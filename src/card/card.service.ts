@@ -55,10 +55,11 @@ export class CardService {
     return this.cardRepository.save(card);
   }
 
-  findAll(): Promise<Card[]> {
-    return this.cardRepository.find({
-      relations: ['services', 'partners', 'referralCode'],
-    });
+  findAll(): Promise<Card[]> | {message: string} {
+    // return this.cardRepository.find({
+    //   relations: ['services', 'partners', 'referralCode'],
+    // });
+    return {message:'Chức năng này hiện không khả dụng'};
   }
 
   findOne(id: number): Promise<Card> {
