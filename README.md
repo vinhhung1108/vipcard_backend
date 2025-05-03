@@ -105,4 +105,4 @@ API for managing users with roles.
 1. Install dependencies: `npm install`
 2. Configure `.env`:
 
-update.01
+update.02
