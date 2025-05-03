@@ -6,9 +6,10 @@ import { CardController } from './card.controller';
 import { Service } from '@src/service/entities/service.entity';
 import { Partner } from '@src/partner/entities/partner.entity';
 import { ReferralCode } from '@src/referral-code/entities/referral-code.entity';
+import { AuthModule } from '@src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Card, Service, Partner, ReferralCode])],
+  imports: [TypeOrmModule.forFeature([Card, Service, Partner, ReferralCode]), AuthModule],
   controllers: [CardController],
   providers: [CardService],
   exports: [CardService],
