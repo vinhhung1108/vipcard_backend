@@ -11,6 +11,10 @@ import { ServiceModule } from './service/service.module';
 import { PartnerModule } from './partner/partner.module';
 import { ReferralCodeModule } from './referral-code/referral-code.module';
 import { CardModule } from './card/card.module';
+import { Card } from './card/entities/card.entity';
+import { Partner } from './partner/entities/partner.entity';
+import { Service } from './service/entities/service.entity';
+import { ReferralCode } from './referral-code/entities/referral-code.entity';
 
 @Module({
   imports: [
@@ -22,7 +26,7 @@ import { CardModule } from './card/card.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [Card, Partner, Service, ReferralCode, User],
       // autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
       logging: true,
