@@ -55,10 +55,15 @@ export class CardService {
     return this.cardRepository.save(card);
   }
 
-  findAll(): Promise<Card[]> {
-    return this.cardRepository.find({
-      relations: ['services', 'partners', 'referralCode'],
-    });
+  async findAll(): Promise<Card[]> {
+    try {
+      return await this.cardRepository.find({
+        relations: ['services', 'partners', 'referralCode'],
+      });
+    } catch (error) {
+      console.error('Error in CardService.findAll:', error);
+      throw new Error('Failed to fetch cards');
+    }
   }
 
   findOne(id: number): Promise<Card> {
