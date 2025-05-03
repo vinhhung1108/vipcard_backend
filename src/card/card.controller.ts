@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -14,7 +14,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { CardResponseDto } from './dto/card-response.dto';
 import { JwtAuthGuard } from '@src/auth/jwt-auth.guard';
-import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { toCardResponseDto } from './dto/card-mapper';
 
 @ApiTags('cards')
@@ -24,58 +24,35 @@ import { toCardResponseDto } from './dto/card-mapper';
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
-  @Post('create')
-  @ApiResponse({
-    status: 201,
-    description: 'Thẻ đã được tạo',
-    type: CardResponseDto,
-  })
-  async create(@Body() createCardDto: CreateCardDto): Promise<CardResponseDto> {
-    const card = await this.cardService.create(createCardDto);
+  @Post()
+  async create(@Body() dto: CreateCardDto): Promise<CardResponseDto> {
+    const card = await this.cardService.create(dto);
     return toCardResponseDto(card);
   }
 
   @Get()
-  @ApiResponse({
-    status: 200,
-    description: 'Danh sách thẻ',
-    type: [CardResponseDto],
-  })
-  async findAll(): Promise<CardResponseDto[] | { message: string; }> {
+  async findAll(): Promise<CardResponseDto[]> {
     const cards = await this.cardService.findAll();
-    return cards.map((card) => toCardResponseDto(card));
+    return cards.map(toCardResponseDto);
   }
 
   @Get(':id')
-  @ApiResponse({
-    status: 200,
-    description: 'Chi tiết thẻ',
-    type: CardResponseDto,
-  })
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<CardResponseDto> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<CardResponseDto> {
     const card = await this.cardService.findOne(id);
     return toCardResponseDto(card);
   }
 
   @Patch(':id')
-  @ApiResponse({
-    status: 200,
-    description: 'Cập nhật thẻ',
-    type: CardResponseDto,
-  })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateCardDto: UpdateCardDto,
+    @Body() dto: UpdateCardDto,
   ): Promise<CardResponseDto> {
-    const card = await this.cardService.update(id, updateCardDto);
+    const card = await this.cardService.update(id, dto);
     return toCardResponseDto(card);
   }
 
   @Delete(':id')
-  @ApiResponse({ status: 204, description: 'Xóa thẻ thành công' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.cardService.remove(id);
+    return this.cardService.remove(id);
   }
 }
