@@ -24,7 +24,7 @@ import { toCardResponseDto } from './dto/card-mapper';
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
-  @Post()
+  @Post('create')
   @ApiResponse({
     status: 201,
     description: 'Thẻ đã được tạo',
