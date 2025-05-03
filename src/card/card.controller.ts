@@ -41,9 +41,10 @@ export class CardController {
     description: 'Danh sách thẻ',
     type: [CardResponseDto],
   })
-  async findAll(): Promise<CardResponseDto[]> {
+  async findAll(): Promise<CardResponseDto[] | { message: string; }> {
     const cards = await this.cardService.findAll();
-    return cards.map((card) => toCardResponseDto(card));
+    // return cards.map((card) => toCardResponseDto(card));
+    return {message: 'all cards here'}
   }
 
   @Get(':id')
