@@ -22,6 +22,11 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory());
 
+  app.enableCors({
+    origin: ['https://card.namident.com'], // hoặc true để cho tất cả origin
+    credentials: true,
+  });
+
   const port = process.env.PORT ?? 3001;
   await app.listen(port, '0.0.0.0');
 }
