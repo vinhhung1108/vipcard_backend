@@ -30,6 +30,20 @@ export class UsersService {
     );
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    // Kiểm tra xem email có tồn tại trong cơ sở dữ liệu hay không
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) {
+      return null; // Nếu không tìm thấy người dùng, trả về null
+    }
+    // Kiểm tra xem email đã được xác thực hay chưa
+    if (!user.isEmailVerified) {
+      throw new BadRequestException('Email not verified');
+    }
+    // Nếu email đã được xác thực, trả về người dùng
+    return user;
+  }
+
   async findById(userId: number): Promise<User | null> {
     return (
       (await this.usersRepository.findOne({ where: { id: userId } })) ?? null
