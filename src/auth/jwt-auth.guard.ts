@@ -12,19 +12,29 @@ export class JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
+
+    // Ưu tiên đọc từ cookie
+    const token = request.cookies?.token;
+
+    // Nếu không có cookie, fallback về header (cho phép cả 2 cách nếu cần tương thích Postman)
     const authHeader = request.headers.authorization;
-    if (!authHeader) {
-      console.log('Không có token trong request'); // Log kiểm tra
+    const bearerToken = authHeader?.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
+      : null;
+
+    const jwtToken = token || bearerToken;
+
+    if (!jwtToken) {
+      console.log('Không tìm thấy JWT trong cookie hoặc header');
       return false;
     }
 
     try {
-      const token = authHeader.split(' ')[1];
-      const decoded = this.jwtService.verify(token);
+      const decoded = this.jwtService.verify(jwtToken);
       request.user = decoded;
       return true;
     } catch (error) {
-      console.error('JWT Error:', error.message); // Xem chi tiết lỗi JWT
+      console.error('JWT Error:', error.message);
       return false;
     }
   }
