@@ -23,7 +23,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, documentFactory());
 
   app.enableCors({
-    origin: ['https://card.namident.com'], // hoặc true để cho tất cả origin
+    origin: ['http://localhost:3000', 'https://card.namident.com'],
     credentials: true,
   });
 
