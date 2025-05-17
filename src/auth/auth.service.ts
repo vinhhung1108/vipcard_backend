@@ -29,6 +29,7 @@ export class AuthService {
     const payload = {
       username: user.username,
       sub: user.id,
+      email: user.email,
       roles: Array.isArray(user.roles) ? user.roles : ['default'],
     };
 
