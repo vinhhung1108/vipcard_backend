@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { ValidationPipe } from '@nestjs/common';
 import { TransformDateInterceptor } from './common/interceptors/transform-date.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 console.log('JWT_SECRET from .env:', process.env.JWT_SECRET); // Thêm dòng này
@@ -21,6 +22,8 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory());
+
+  app.use(cookieParser());
 
   app.enableCors({
     origin: ['http://localhost:3000', 'https://card.namident.com'],
