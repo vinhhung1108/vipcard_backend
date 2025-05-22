@@ -37,7 +37,9 @@ export class CardController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<CardResponseDto> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CardResponseDto> {
     const card = await this.cardService.findOne(id);
     return toCardResponseDto(card);
   }

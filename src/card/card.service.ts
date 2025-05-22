@@ -24,15 +24,19 @@ export class CardService {
   async create(dto: CreateCardDto): Promise<Card> {
     const { serviceIds, partnerIds, referralCodeId, ...data } = dto;
 
-    const services = await this.serviceRepository.find({ where: { id: In(serviceIds) } });
-    const partners = await this.partnerRepository.find({ where: { id: In(partnerIds) } });
+    const services = await this.serviceRepository.find({
+      where: { id: In(serviceIds) },
+    });
+    const partners = await this.partnerRepository.find({
+      where: { id: In(partnerIds) },
+    });
     const referralCode = referralCodeId
       ? await this.referralCodeRepository.findOneBy({ id: referralCodeId })
       : null;
 
     const card = this.cardRepository.create({
       ...data,
-      expireAt: new Date(dto.expireAt),
+      expiredAt: new Date(dto.expiredAt),
       services,
       partners,
       referralCode,
