@@ -7,7 +7,7 @@ export class CardResponseDto {
   code: string;
   value: number;
   remainingValue: number;
-  expireAt: string;
+  expiredAt: string;
   createdAt: string;
   updatedAt: string;
   services: Service[];

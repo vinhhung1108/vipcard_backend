@@ -27,7 +27,7 @@ export class Card {
   remainingValue: number;
 
   @Column({ type: 'timestamp' })
-  expireAt: Date;
+  expiredAt: Date;
 
   @ManyToMany(() => Service, { eager: true })
   @JoinTable()

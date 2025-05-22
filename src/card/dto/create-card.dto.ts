@@ -19,7 +19,7 @@ export class CreateCardDto {
   remainingValue: number;
 
   @IsDateString()
-  expireAt: string;
+  expiredAt: string;
 
   @IsArray()
   @IsNumber({}, { each: true })
