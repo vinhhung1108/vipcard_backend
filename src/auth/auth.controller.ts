@@ -5,6 +5,7 @@ import {
   Get,
   UseGuards,
   Request,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -21,7 +22,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard) // Đảm bảo user đã đăng nhập mới logout được
+  @UseGuards(JwtAuthGuard)
   async logout(@Body() logoutDto: LogoutDto) {
     return this.authService.logout(logoutDto.userId);
   }
@@ -36,5 +37,13 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   getProfile(@Request() req) {
     return { user: req.user };
+  }
+
+  // Endpoint mới để kiểm tra token hợp lệ
+  @Get('verify-token')
+  @HttpCode(200) // Trả về mã 200 nếu token hợp lệ
+  @UseGuards(JwtAuthGuard)
+  verifyToken(@Request() req) {
+    return { user: req.user, message: 'Token hợp lệ' };
   }
 }
