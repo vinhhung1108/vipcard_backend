@@ -178,20 +178,7 @@ export class CardService {
       });
 
       console.log('Dữ liệu card trước khi lưu:', JSON.stringify(card, null, 2));
-      const savedCard = await this.cardRepository.save(card, { reload: false });
-
-      // Kiểm tra expiredAt sau khi lưu
-      if (
-        !(savedCard.expiredAt instanceof Date) ||
-        isNaN(savedCard.expiredAt.getTime())
-      ) {
-        console.error(
-          `expiredAt sau khi lưu không hợp lệ: ${savedCard.expiredAt}`,
-        );
-        throw new Error('Lỗi server: expiredAt không hợp lệ sau khi lưu');
-      }
-
-      return savedCard;
+      return await this.cardRepository.save(card); // Xóa { reload: false }
     } catch (error) {
       console.error(`Lỗi khi cập nhật card với ID ${id}:`, error);
       if (

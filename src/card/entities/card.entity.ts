@@ -7,6 +7,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  AfterLoad,
 } from 'typeorm';
 import { Service } from '@src/service/entities/service.entity';
 import { Partner } from '@src/partner/entities/partner.entity';
@@ -45,4 +46,17 @@ export class Card {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @AfterLoad()
+  transformDates() {
+    if (typeof this.expiredAt === 'string') {
+      this.expiredAt = new Date(this.expiredAt);
+    }
+    if (typeof this.createdAt === 'string') {
+      this.createdAt = new Date(this.createdAt);
+    }
+    if (typeof this.updatedAt === 'string') {
+      this.updatedAt = new Date(this.updatedAt);
+    }
+  }
 }
