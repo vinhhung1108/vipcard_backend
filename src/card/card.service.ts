@@ -67,7 +67,26 @@ export class CardService {
       });
       if (!card) throw new NotFoundException(`Card với ID ${id} không tồn tại`);
 
-      // Kiểm tra serviceIds: nếu null thì không cập nhật, nếu mảng rỗng thì xóa quan hệ
+      // Xóa quan hệ cũ trước khi cập nhật
+      if (dto.serviceIds !== undefined) {
+        await this.cardRepository
+          .createQueryBuilder()
+          .relation(Card, 'services')
+          .of(card)
+          .remove(card.services);
+        card.services = [];
+      }
+
+      if (dto.partnerIds !== undefined) {
+        await this.cardRepository
+          .createQueryBuilder()
+          .relation(Card, 'partners')
+          .of(card)
+          .remove(card.partners);
+        card.partners = [];
+      }
+
+      // Kiểm tra serviceIds: nếu null hoặc mảng rỗng thì không có quan hệ
       let services = card.services;
       if (dto.serviceIds !== undefined) {
         if (
@@ -87,7 +106,7 @@ export class CardService {
         }
       }
 
-      // Kiểm tra partnerIds: nếu null thì không cập nhật, nếu mảng rỗng thì xóa quan hệ
+      // Kiểm tra partnerIds: nếu null hoặc mảng rỗng thì không có quan hệ
       let partners = card.partners;
       if (dto.partnerIds !== undefined) {
         if (
@@ -145,8 +164,8 @@ export class CardService {
         referralCode,
       });
 
-      console.log('Dữ liệu card trước khi lưu:', card); // Log để debug
-      return await this.cardRepository.save(card);
+      console.log('Dữ liệu card trước khi lưu:', JSON.stringify(card, null, 2)); // Log chi tiết
+      return await this.cardRepository.save(card, { reload: false });
     } catch (error) {
       console.error(`Lỗi khi cập nhật card với ID ${id}:`, error);
       if (
