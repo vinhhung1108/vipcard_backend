@@ -8,6 +8,8 @@ import {
   Post,
   UseGuards,
   ParseIntPipe,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -49,8 +51,20 @@ export class CardController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCardDto,
   ): Promise<CardResponseDto> {
-    const card = await this.cardService.update(id, dto);
-    return toCardResponseDto(card);
+    try {
+      const card = await this.cardService.update(id, dto);
+      console.log('Card sau khi cập nhật:', JSON.stringify(card, null, 2));
+      return toCardResponseDto(card);
+    } catch (error) {
+      console.error('Lỗi trong CardController.update:', error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        error.message || 'Lỗi server khi cập nhật card',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Delete(':id')
