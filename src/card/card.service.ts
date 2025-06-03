@@ -67,6 +67,19 @@ export class CardService {
       });
       if (!card) throw new NotFoundException(`Card với ID ${id} không tồn tại`);
 
+      // Kiểm tra expiredAt hiện tại của card
+      if (
+        !(card.expiredAt instanceof Date) ||
+        isNaN(card.expiredAt.getTime())
+      ) {
+        console.error(
+          `expiredAt hiện tại của card không hợp lệ: ${card.expiredAt}`,
+        );
+        throw new BadRequestException(
+          'Dữ liệu expiredAt hiện tại của card không hợp lệ',
+        );
+      }
+
       // Xóa quan hệ cũ trước khi cập nhật
       if (dto.serviceIds !== undefined) {
         await this.cardRepository
@@ -150,9 +163,9 @@ export class CardService {
               'expiredAt phải là định dạng ISO 8601 hợp lệ',
             );
           }
-        } catch (err) {
+        } catch {
           throw new BadRequestException(
-            `expiredAt phải là định dạng ISO 8601 hợp lệ: ${err.message}`,
+            'expiredAt phải là định dạng ISO 8601 hợp lệ',
           );
         }
       }
@@ -164,8 +177,21 @@ export class CardService {
         referralCode,
       });
 
-      console.log('Dữ liệu card trước khi lưu:', JSON.stringify(card, null, 2)); // Log chi tiết
-      return await this.cardRepository.save(card, { reload: false });
+      console.log('Dữ liệu card trước khi lưu:', JSON.stringify(card, null, 2));
+      const savedCard = await this.cardRepository.save(card, { reload: false });
+
+      // Kiểm tra expiredAt sau khi lưu
+      if (
+        !(savedCard.expiredAt instanceof Date) ||
+        isNaN(savedCard.expiredAt.getTime())
+      ) {
+        console.error(
+          `expiredAt sau khi lưu không hợp lệ: ${savedCard.expiredAt}`,
+        );
+        throw new Error('Lỗi server: expiredAt không hợp lệ sau khi lưu');
+      }
+
+      return savedCard;
     } catch (error) {
       console.error(`Lỗi khi cập nhật card với ID ${id}:`, error);
       if (
