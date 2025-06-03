@@ -29,7 +29,6 @@ export class CreateCardDto {
   })
   @IsDateString()
   @Transform(({ value }) => {
-    // Hỗ trợ ánh xạ từ 'expireAt' sang 'expiredAt'
     if (typeof value === 'string') {
       return value;
     }
@@ -41,26 +40,31 @@ export class CreateCardDto {
     description: 'Danh sách ID dịch vụ',
     type: [Number],
     example: [1],
+    nullable: true,
   })
   @IsArray()
   @IsNumber({}, { each: true })
-  serviceIds: number[];
+  @IsOptional() // Cho phép null
+  serviceIds: number[] | null;
 
   @ApiProperty({
     description: 'Danh sách ID đối tác',
     type: [Number],
     example: [1],
+    nullable: true,
   })
   @IsArray()
   @IsNumber({}, { each: true })
-  partnerIds: number[];
+  @IsOptional() // Cho phép null
+  partnerIds: number[] | null;
 
   @ApiProperty({
     description: 'ID mã giới thiệu (tùy chọn)',
     example: 1,
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsNumber()
-  referralCodeId?: number;
+  referralCodeId?: number | null;
 }
