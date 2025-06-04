@@ -52,11 +52,26 @@ export class CardController {
     @Body() dto: UpdateCardDto,
   ): Promise<CardResponseDto> {
     try {
+      console.log(
+        'Nhận yêu cầu PATCH với payload:',
+        JSON.stringify(dto, null, 2),
+      );
       const card = await this.cardService.update(id, dto);
       console.log('Card sau khi cập nhật:', JSON.stringify(card, null, 2));
-      return toCardResponseDto(card);
+      const response = toCardResponseDto(card);
+      console.log('Response trả về:', JSON.stringify(response, null, 2));
+      return response;
     } catch (error) {
       console.error('Lỗi trong CardController.update:', error);
+      if (
+        error.name === 'JsonWebTokenError' ||
+        error.message === 'jwt expired'
+      ) {
+        throw new HttpException(
+          'Token không hợp lệ hoặc đã hết hạn',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
       if (error instanceof HttpException) {
         throw error;
       }

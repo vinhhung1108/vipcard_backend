@@ -220,9 +220,16 @@ export class CardService {
           `Card với ID ${id} không tồn tại sau khi cập nhật`,
         );
 
-      updatedCard.expiredAt = this.toDate(updatedCard.expiredAt);
-      updatedCard.createdAt = this.toDate(updatedCard.createdAt);
-      updatedCard.updatedAt = this.toDate(updatedCard.updatedAt);
+      // Đảm bảo các trường ngày là Date trước khi trả về
+      if (typeof updatedCard.expiredAt === 'string') {
+        updatedCard.expiredAt = this.toDate(updatedCard.expiredAt);
+      }
+      if (typeof updatedCard.createdAt === 'string') {
+        updatedCard.createdAt = this.toDate(updatedCard.createdAt);
+      }
+      if (typeof updatedCard.updatedAt === 'string') {
+        updatedCard.updatedAt = this.toDate(updatedCard.updatedAt);
+      }
 
       return updatedCard;
     } catch (error) {
