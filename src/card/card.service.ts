@@ -25,6 +25,14 @@ export class CardService {
     private readonly referralCodeRepository: Repository<ReferralCode>,
   ) {}
 
+  private toDate(dateStr: any): Date {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      throw new BadRequestException(`Ngày không hợp lệ: ${dateStr}`);
+    }
+    return date;
+  }
+
   async create(dto: CreateCardDto): Promise<Card> {
     const { serviceIds, partnerIds, referralCodeId, ...data } = dto;
 
@@ -42,21 +50,35 @@ export class CardService {
 
     const card = this.cardRepository.create({
       ...data,
-      expiredAt: new Date(dto.expiredAt),
+      expiredAt: this.toDate(dto.expiredAt),
       services,
       partners,
       referralCode,
     });
 
-    return this.cardRepository.save(card);
+    const savedCard = await this.cardRepository.save(card);
+    savedCard.expiredAt = this.toDate(savedCard.expiredAt);
+    savedCard.createdAt = this.toDate(savedCard.createdAt);
+    savedCard.updatedAt = this.toDate(savedCard.updatedAt);
+    return savedCard;
   }
 
-  findAll(): Promise<Card[]> {
-    return this.cardRepository.find();
+  async findAll(): Promise<Card[]> {
+    const cards = await this.cardRepository.find();
+    return cards.map((card) => ({
+      ...card,
+      expiredAt: this.toDate(card.expiredAt),
+      createdAt: this.toDate(card.createdAt),
+      updatedAt: this.toDate(card.updatedAt),
+    }));
   }
 
-  findOne(id: number): Promise<Card> {
-    return this.cardRepository.findOneByOrFail({ id });
+  async findOne(id: number): Promise<Card> {
+    const card = await this.cardRepository.findOneByOrFail({ id });
+    card.expiredAt = this.toDate(card.expiredAt);
+    card.createdAt = this.toDate(card.createdAt);
+    card.updatedAt = this.toDate(card.updatedAt);
+    return card;
   }
 
   async update(id: number, dto: UpdateCardDto): Promise<Card> {
@@ -67,25 +89,10 @@ export class CardService {
       });
       if (!card) throw new NotFoundException(`Card với ID ${id} không tồn tại`);
 
-      // Chuyển đổi các trường ngày thành Date thủ công
-      card.expiredAt = new Date(card.expiredAt);
-      card.createdAt = new Date(card.createdAt);
-      card.updatedAt = new Date(card.updatedAt);
+      card.expiredAt = this.toDate(card.expiredAt);
+      card.createdAt = this.toDate(card.createdAt);
+      card.updatedAt = this.toDate(card.updatedAt);
 
-      // Kiểm tra expiredAt hiện tại của card
-      if (
-        !(card.expiredAt instanceof Date) ||
-        isNaN(card.expiredAt.getTime())
-      ) {
-        console.error(
-          `expiredAt hiện tại của card không hợp lệ: ${card.expiredAt}`,
-        );
-        throw new BadRequestException(
-          'Dữ liệu expiredAt hiện tại của card không hợp lệ',
-        );
-      }
-
-      // Xóa quan hệ cũ trước khi cập nhật
       if (dto.serviceIds !== undefined) {
         await this.cardRepository
           .createQueryBuilder()
@@ -104,7 +111,6 @@ export class CardService {
         card.partners = [];
       }
 
-      // Kiểm tra serviceIds: nếu null hoặc mảng rỗng thì không có quan hệ
       let services = card.services;
       if (dto.serviceIds !== undefined) {
         if (
@@ -124,7 +130,6 @@ export class CardService {
         }
       }
 
-      // Kiểm tra partnerIds: nếu null hoặc mảng rỗng thì không có quan hệ
       let partners = card.partners;
       if (dto.partnerIds !== undefined) {
         if (
@@ -144,7 +149,6 @@ export class CardService {
         }
       }
 
-      // Kiểm tra referralCodeId: nếu null thì xóa quan hệ
       let referralCode = card.referralCode;
       if (dto.referralCodeId !== undefined) {
         referralCode = dto.referralCodeId
@@ -159,24 +163,19 @@ export class CardService {
         }
       }
 
-      // Chuyển expiredAt thành Date nếu có (entity yêu cầu Date)
       let newExpiredAt: Date | undefined;
-      if (dto.expiredAt) {
+      if (dto.expiredAt !== null && dto.expiredAt !== undefined) {
         try {
-          newExpiredAt = new Date(dto.expiredAt);
-          if (isNaN(newExpiredAt.getTime())) {
-            throw new BadRequestException(
-              'expiredAt phải là định dạng ISO 8601 hợp lệ',
-            );
-          }
+          newExpiredAt = this.toDate(dto.expiredAt);
         } catch {
           throw new BadRequestException(
             'expiredAt phải là định dạng ISO 8601 hợp lệ',
           );
         }
+      } else {
+        throw new BadRequestException('expiredAt không được để trống');
       }
 
-      // Cập nhật card
       Object.assign(card, dto, {
         services,
         partners,
@@ -185,66 +184,33 @@ export class CardService {
 
       console.log('Dữ liệu card trước khi lưu:', JSON.stringify(card, null, 2));
 
-      // Cập nhật card bằng createQueryBuilder để ép TypeORM cập nhật expiredAt
-      if (newExpiredAt) {
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({
+          value: card.value,
+          remainingValue: card.remainingValue,
+          expiredAt: newExpiredAt,
+          referralCode: referralCode,
+        })
+        .where('id = :id', { id })
+        .execute();
+
+      if (services.length > 0) {
         await this.cardRepository
           .createQueryBuilder()
-          .update(Card)
-          .set({
-            value: card.value,
-            remainingValue: card.remainingValue,
-            expiredAt: newExpiredAt,
-            referralCode: referralCode,
-          })
-          .where('id = :id', { id })
-          .execute();
-
-        // Cập nhật quan hệ
-        if (services.length > 0) {
-          await this.cardRepository
-            .createQueryBuilder()
-            .relation(Card, 'services')
-            .of(card)
-            .add(services);
-        }
-        if (partners.length > 0) {
-          await this.cardRepository
-            .createQueryBuilder()
-            .relation(Card, 'partners')
-            .of(card)
-            .add(partners);
-        }
-      } else {
-        // Nếu không thay đổi expiredAt, chỉ cập nhật các trường khác
+          .relation(Card, 'services')
+          .of(card)
+          .add(services);
+      }
+      if (partners.length > 0) {
         await this.cardRepository
           .createQueryBuilder()
-          .update(Card)
-          .set({
-            value: card.value,
-            remainingValue: card.remainingValue,
-            referralCode: referralCode,
-          })
-          .where('id = :id', { id })
-          .execute();
-
-        // Cập nhật quan hệ
-        if (services.length > 0) {
-          await this.cardRepository
-            .createQueryBuilder()
-            .relation(Card, 'services')
-            .of(card)
-            .add(services);
-        }
-        if (partners.length > 0) {
-          await this.cardRepository
-            .createQueryBuilder()
-            .relation(Card, 'partners')
-            .of(card)
-            .add(partners);
-        }
+          .relation(Card, 'partners')
+          .of(card)
+          .add(partners);
       }
 
-      // Tải lại card để đảm bảo dữ liệu mới nhất
       const updatedCard = await this.cardRepository.findOne({
         where: { id },
         relations: ['services', 'partners', 'referralCode'],
@@ -254,10 +220,9 @@ export class CardService {
           `Card với ID ${id} không tồn tại sau khi cập nhật`,
         );
 
-      // Chuyển đổi các trường ngày thành Date thủ công
-      updatedCard.expiredAt = new Date(updatedCard.expiredAt);
-      updatedCard.createdAt = new Date(updatedCard.createdAt);
-      updatedCard.updatedAt = new Date(updatedCard.updatedAt);
+      updatedCard.expiredAt = this.toDate(updatedCard.expiredAt);
+      updatedCard.createdAt = this.toDate(updatedCard.createdAt);
+      updatedCard.updatedAt = this.toDate(updatedCard.updatedAt);
 
       return updatedCard;
     } catch (error) {
